@@ -1,1 +1,1 @@
-Wasserstein Hypothesis Test for Group Fairness
+#Wasserstein Hypothesis Test for Group Fairness
