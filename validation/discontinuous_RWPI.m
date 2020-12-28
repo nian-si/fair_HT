@@ -13,7 +13,7 @@ for i = 1:N
         s = s - t(i,1)*t(i,2);
         val = val + t(i,2);
     else
-        val = val + s/t(i);
+        val = val + s/t(i,1);
         break;
     end
 end
