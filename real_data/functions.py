@@ -20,6 +20,7 @@ def U_var(data_sensitive, data_label):
 def C_classifier(data, theta, tau):
     # logistics
     return (1./(1+np.exp(-np.dot(data, theta))) >= tau)
+    
 
 def Kernel(x,h):
     return 1/np.sqrt(2*math.pi) * np.exp (- (x/h)**2 / 2) / h
@@ -77,7 +78,7 @@ def get_marginals(sensitives, target):
     return P_00, P_01, P_10, P_11
 
 
-def calculate_distance_eqopp(data_tuple, theta, tau):
+def calculate_distance_eqopp(data_tuple, theta, tau, eps = 0):
     data = data_tuple[0]
     # print(data)
     data_sensitive = data_tuple[1]
@@ -88,9 +89,17 @@ def calculate_distance_eqopp(data_tuple, theta, tau):
     d = distance_func(theta,data,w)
     C = C_classifier(data, theta, tau)
     
-    phi = data_sensitive * data_label  /emp_marginals[1,1]- (1 - data_sensitive) * data_label/emp_marginals[0,1]
+    phi = phi_function(data_sensitive, data_label, emp_marginals)
     
-    s = - np.dot(C,phi).sum()
+    s = np.dot(C,phi).sum()
+    if eps > 0:
+        if s / N < eps:
+            return 0
+        else:
+            s = N* eps - s
+    else:
+        s = -s
+    print(s / N)
     # phi = phi_func((A==1 & Y==1),(A==0 & Y==1));
     # s = - (C.*phi).sum();
     # t = [sign(s) ./d .* (1 - 2* C) .* phi,d];

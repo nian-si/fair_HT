@@ -61,6 +61,7 @@ def load_compas_data(DIR_DATA=DIR_DATA):
 
     # convert class label 0 to -1
     y = data[CLASS_FEATURE]
+    
     # y[y == 0] = -1
 
     print("\nNumber of people recidivating within two years")
@@ -106,7 +107,9 @@ def load_compas_data(DIR_DATA=DIR_DATA):
                         feature_names.append(attr + "_" + str(k))
 
     # convert the sensitive feature to 1-d array
+   
     x_control = dict(x_control)
+    
     for k in x_control.keys():
         assert (x_control[k].shape[1] == 1)  # make sure that the sensitive feature is binary after one hot encoding
         x_control[k] = np.array(x_control[k]).flatten()
@@ -124,7 +127,9 @@ def load_compas_data(DIR_DATA=DIR_DATA):
 
     assert (len(feature_names) == X.shape[1])
     print("Features we will be using for classification are:", feature_names, "\n")
-    x_control = x_control['race']
+    x_control = 1 - x_control['race']
+    print("African-American is 1; Caucasian is 0")
+
     return X, y, x_control
 
 

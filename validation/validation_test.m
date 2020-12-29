@@ -1,14 +1,16 @@
-T = 2000;
+T = 1000;
 rec=zeros(1,T);
 
 d = 2;
 tau = 0.5;
 theta = [0,1]';
-Nlist = [30,  100,500,1000,2000];
+Nlist = [100,1000,2000];
 p11 = 0.4;
 p01 = 0.1;
 p10 = 0.4;
 p00 = 0.1;
+
+
 alphalist = [0.1,0.05,0.01];
 for N = Nlist
     N
@@ -28,7 +30,7 @@ for N = Nlist
        
     end
     
-    mean(rec);
+   
     var = compute_variance(p11 , p01 , p10, p00);
     [mean(rec),var]
 
