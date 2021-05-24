@@ -1,4 +1,4 @@
-#Wasserstein Hypothesis Test for Group Fairness
+# Wasserstein Hypothesis Test for Group Fairness
 
 ICML 2021 Testing Group Fairness via Optimal Transport Projections
 
