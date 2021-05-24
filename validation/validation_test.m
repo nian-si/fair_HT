@@ -1,10 +1,10 @@
-T = 1000;
-rec=zeros(1,T);
-
+T = 2000;
+rec=zeros(T,1);
+empirical_var = zeros(T,1);
 d = 2;
 tau = 0.5;
 theta = [0,1]';
-Nlist = [100,1000,2000];
+Nlist = [30,100,500,1000,2000];
 p11 = 0.4;
 p01 = 0.1;
 p10 = 0.4;
@@ -14,6 +14,7 @@ p00 = 0.1;
 alphalist = [0.1,0.05,0.01];
 for N = Nlist
     N
+    var = compute_variance(p11 , p01 , p10, p00);
     
     parfor t = 1:T
         X2 = normrnd(0,sqrt(5),N,1);
@@ -26,21 +27,25 @@ for N = Nlist
         X1 = A.*rnd_A1 +  Y.*rnd_A0Y1.*(1-A) + (1-Y).*rnd_A0Y0.*(1-A);
         X = [X1,X2];
         phi_func = @(u1,u2)(u1/mean(u1) - u2/mean(u2));
+        phi_derivative = @(u1,u2)([-u1/mean(u1)^2,  u2/mean(u2)^2]);
         rec(t) = discontinuous_RWPI(X,A,Y,theta,N,tau,phi_func );
+        empirical_var(t) = compute_empirical_variance(X,A,Y,theta,tau,phi_func,phi_derivative);
+        
        
     end
     
    
-    var = compute_variance(p11 , p01 , p10, p00);
-    [mean(rec),var]
+    
+    
+    [mean(rec),var,mean(empirical_var)]
 
    
   
     figure
     hold on
     
-    threshold = var * chi2inv(1-alphalist ,1);
-    [sum(rec>threshold(1)) / T,sum(rec>threshold(2)) / T,sum(rec>threshold(3)) / T]
+    threshold = empirical_var * chi2inv(1-alphalist ,1);
+    [sum(rec>threshold(:,1)) / T,sum(rec>threshold(:,2)) / T,sum(rec>threshold(:,3)) / T]
     plot_max = 3;
     x = 0:0.01:plot_max;
     y = chi2pdf(x/var,1)/var;  
@@ -62,5 +67,5 @@ set(gcf, 'PaperPositionMode', 'auto');
     hold off
     
     %plot(x,chi2pdf(x,df),'linewidth',1.5);
-  
+%   
 end

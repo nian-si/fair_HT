@@ -46,12 +46,15 @@ def load_compas_data(DIR_DATA=DIR_DATA):
 
     # In a similar vein, ordinary traffic offenses -- those with a c_charge_degree of 'O' -- will not result in Jail time are removed (only two of them).
     idx = np.logical_and(idx, data["c_charge_degree"] != "O")  # F: felony, M: misconduct
+    print(sum(idx))
 
     # We filtered the underlying data from Broward county to include only those rows representing people who had either recidivated in two years, or had at least two years outside of a correctional facility.
     idx = np.logical_and(idx, data["score_text"] != "NA")
+    print(sum(idx))
 
     # we will only consider blacks and whites for this analysis
     idx = np.logical_and(idx, np.logical_or(data["race"] == "African-American", data["race"] == "Caucasian"))
+    print(sum(idx))
 
     # select the examples that satisfy this criteria
     for k in data.keys():
@@ -140,13 +143,16 @@ def load_drug_data(DIR_DATA=DIR_DATA):
     data = np.array(g[:, 1:13])  # Remove the ID and labels
     labels = g[:, 13:]
     yfalse_value = 'CL0'
-    y = np.array([1.0 if yy == yfalse_value else 0.0 for yy in labels[:, 5]])
+    y = np.array([1.0 if yy == yfalse_value else 0.0 for yy in labels[:, 5]]) # Cannabis
+    
+  
     dataset = namedtuple('_', 'data, target')(data, y)
     print('Loading Drug (black vs others) dataset...')
     # dataset_train = load_drug()
     sensible_feature = 4  # ethnicity
     a = np.array([1.0 if el == -0.31685 else 0 for el in data[:, sensible_feature]])
     X = np.delete(data, sensible_feature, axis=1).astype(float)
+    print(sum(y))
     return X, y, a
 
 
@@ -322,8 +328,10 @@ def load_adult(DIR_DATA=DIR_DATA, smaller=False, scaler=True):
         b, c = np.unique(data[col], return_inverse=True)
         data[col] = c
     datamat = data.values
+    
     target = np.array([-1.0 if val == 0 else 1.0 for val in np.array(datamat)[:, -1]])
     datamat = datamat[:, :-1]
+    
     if scaler:
         scaler = StandardScaler()
         scaler.fit(datamat)
@@ -337,7 +345,12 @@ def load_adult(DIR_DATA=DIR_DATA, smaller=False, scaler=True):
         data = namedtuple('_', 'data, target')(datamat[:len_train, :-1], target[:len_train])
         data_test = namedtuple('_', 'data, target')(datamat[len_train:, :-1], target[len_train:])
 
+    
     dataset_train, dataset_test = data, data_test
+    print("Features:","Age", "workclass", "fnlwgt", "education", "education-num", "marital-status",
+            "occupation", "relationship", "race",  "capital gain", "capital loss",
+            "hours per week") 
+   
     y_train_all = dataset_train.target
     y_train_all[y_train_all == -1] = 0
     y_test = dataset_test.target
@@ -362,6 +375,7 @@ def load_adult(DIR_DATA=DIR_DATA, smaller=False, scaler=True):
     X = dataset_train_sensitive_free
     a = sensitive_attributes_train
     y = y_train_all
+   
     return X, y, a, X_test, y_test, a_test
 
 
@@ -684,6 +698,7 @@ def upload_data(ds, n_samples=None, marginals=None):
         test_set_fixed = 1
         K3 = 1
         X, y, a, X_test, y_test, a_test = load_adult(DIR_DATA=DIR_DATA)
+        return X, y, a, X_test, y_test, a_test
     elif ds == 'zafar_toy':
         test_set_fixed = 0
         X, y, a = generate_synthetic_data_zafar(plot_data=True)
